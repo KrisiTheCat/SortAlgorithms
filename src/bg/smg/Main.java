@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -19,18 +20,20 @@ public class Main extends JFrame {
     private JComboBox<String> sortingComboBox;
     private JLabel[] labels;
     private JPanel centerPanel;
-
-    int[] array = {50, 60, 70, 80, 90, 100, 110};
-    final static int ARRAY_SIZE = 7;
+    private MainPanel mainPanel;
+    int[] array = {50, 60, 70, 80, 90, 100, 110, 120, 130};
+    final static int ARRAY_SIZE = 9;
     public Main() {
         setTitle("Sorting Homework");
-        setSize(650, 200);
+        setSize(930, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screenSize.width - 650) / 2;
-        int y = (screenSize.height - 200) / 2;
+        int x = (screenSize.width - 930) / 2;
+        int y = (screenSize.height - 250) / 2;
         setLocation(x, y);
+
+        mainPanel = new MainPanel(array);
 
         randomize();
 
@@ -55,7 +58,7 @@ public class Main extends JFrame {
                     quickSort(array, 0, ARRAY_SIZE-1);
                 else if(selectedAlgorithm.equals("Heap sort"))
                     heapSort(array, ARRAY_SIZE);
-                displayImages();
+                mainPanel.repaint();
             }
         });
         topPanel.add(sortButton);
@@ -65,17 +68,14 @@ public class Main extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 randomize();
-                displayImages();
+                mainPanel.queue.add(array);
+                mainPanel.repaint();
             }
         });
         topPanel.add(randButton);
 
         add(topPanel, BorderLayout.NORTH);
-
-        centerPanel = new JPanel();
-        labels = new JLabel[7];
-        displayImages();
-        add(centerPanel, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
         setVisible(true);
     }
 
@@ -89,26 +89,13 @@ public class Main extends JFrame {
             array[i] = temp;
         }
     }
-    public void displayImages() {
-        centerPanel.removeAll();
-        int width = 10;
-        for (int i = 0; i < 7; i++) {
-            try {
-                BufferedImage originalImage = ImageIO.read(new File("res/ball.png"));
-                Image scaledImage = originalImage.getScaledInstance(array[i], array[i], Image.SCALE_DEFAULT);
-                JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
-                labels[i] = new JLabel(new ImageIcon(scaledImage));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            centerPanel.add(labels[i]);
-        }
-        centerPanel.revalidate();
-        centerPanel.repaint();
-    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::new);
+    }
+    int kr = 10;
+    private void updateProgress(int[] arr) {
+        mainPanel.queue.add(Arrays.copyOf(arr, ARRAY_SIZE));
     }
 
     /*SORT ALGORITHMS*/
@@ -127,6 +114,7 @@ public class Main extends JFrame {
                     temp = arr[j];
                     arr[j] = arr[j+1];
                     arr[j+1] = temp;
+                    updateProgress(arr);
                 }
             }
         }
@@ -145,6 +133,7 @@ public class Main extends JFrame {
                 arr[i] = arr[minId];
                 arr[minId] = temp;
             }
+            updateProgress(arr);
         }
     }
     void insertionSort(int[] arr, int n){
@@ -155,6 +144,7 @@ public class Main extends JFrame {
                 arr[j+1] = arr[j];
             }
             arr[j+1] = temp;
+            updateProgress(arr);
         }
     }
 
