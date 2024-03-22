@@ -57,7 +57,7 @@ public class Main extends JFrame {
                 else if(selectedAlgorithm.equals("Quick sort"))
                     quickSort(array, 0, ARRAY_SIZE-1);
                 else if(selectedAlgorithm.equals("Heap sort"))
-                    heapSort(array, ARRAY_SIZE);
+                    heapSort(array);
                 mainPanel.repaint();
             }
         });
@@ -121,9 +121,9 @@ public class Main extends JFrame {
     }
     void selectionSort(int[] arr, int n){
         int temp, minId;
-        for(int i = 0; i < n-1; i++){
+        for(int i = 0; i < n; i++){
             minId = i;
-            for(int j = i+1; j < n - 1; j++){
+            for(int j = i+1; j < n; j++){
                 if(arr[j] < arr[minId]){
                     minId = j;
                 }
@@ -159,6 +159,7 @@ public class Main extends JFrame {
         }
         pivotId++;
         swap(arr,r, pivotId);
+        updateProgress(arr);
         return pivotId;
     }
     void quickSort(int arr[], int l, int r){
@@ -169,27 +170,37 @@ public class Main extends JFrame {
         }
     }
 
-    void heapSort(int arr[], int n){
-        for(int i = n/2-1; i>= 0; i--){
-            heapify(arr,n,i);
-        }
-        for(int i = n-1; i>= 0; i--){
-            swap(arr, 0, i);
-            heapify(arr,i,0);
+    public void heapSort(int arr[]) {
+        int N = arr.length;
+        for (int i = N / 2 - 1; i >= 0; i--)
+            heapify(arr, N, i);
+        updateProgress(arr);
+        for (int i = N - 1; i > 0; i--) {
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+
+            heapify(arr, i, 0);
+            updateProgress(arr);
         }
     }
-    void heapify(int arr[], int n, int i){
+
+    void heapify(int arr[], int n, int i) {
         int largest = i;
-        int l = i*2+1;
-        int r = i*2+2;
-        if(l<n && arr[l]>arr[i]){
+        int l = 2 * i + 1;
+        int r = 2 * i + 2;
+
+        if (l < n && arr[l] > arr[largest])
             largest = l;
-        }
-        if(r<n && arr[r]>arr[i]){
+
+        if (r < n && arr[r] > arr[largest])
             largest = r;
-        }
-        if(largest != i){
-            swap(arr,largest, i);
+
+        if (largest != i) {
+            int swap = arr[i];
+            arr[i] = arr[largest];
+            arr[largest] = swap;
+
             heapify(arr, n, largest);
         }
     }
@@ -218,6 +229,7 @@ public class Main extends JFrame {
                 j++;
             }
         }
+        updateProgress(arr);
     }
     void mergeSort(int arr[], int l, int r){
         if(l < r){
